@@ -1,4 +1,4 @@
-import { TextField, Grid, Button, Typography, Link } from '@mui/material';
+import { TextField, Grid, Button, Typography, Link, CircularProgress } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,7 +25,7 @@ export default function(props) {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { currentUser } = useSelector(state => state.auth)
+    const { currentUser, error, loading } = useSelector(state => state.auth)
     const [ email, setEmail ] = React.useState('')
     const emailInputHandler = React.useCallback(
         (e) => {
@@ -68,7 +68,7 @@ export default function(props) {
         }
     }, [currentUser])
 
-    const submitEnabled = React.useMemo(() => (mode !== 'signup' || email.length) && username.length && password.length, [email, username, password, mode])
+    const submitEnabled = React.useMemo(() => (mode !== 'signup' || email.length) && username.length && password.length && !loading, [email, username, password, mode, loading])
 
     return (<>
             <Grid className={classes.signupForm} container direction='column'>
@@ -87,6 +87,8 @@ export default function(props) {
                     {mode === 'signup' && <Button variant='outlined' onClick={signupButtonClickHandler} disabled={!submitEnabled}>Sign Up</Button>}
                     {mode === 'login' && <Button variant='outlined' onClick={loginButtonClickHandler} disabled={!submitEnabled}>Login</Button>}
                 </div>
+                {error && <Typography>{error}</Typography>}
+                {loading && <Typography><CircularProgress /></Typography>}
                 <div className={classes.authFormField}>
                     {mode === 'signup' && <Link sx={{cursor: 'pointer'}} onClick={goToLogin}>Log In</Link>}
                     {mode === 'login' && <Link sx={{cursor: 'pointer'}} onClick={goToSignup}>Sign Up</Link>}

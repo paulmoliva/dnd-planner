@@ -25,7 +25,8 @@ export const authSlice = createSlice({
             state.error = action.payload
         },
         setLoading: (state, action) => {
-            state.loading = action.payload
+            state.error = action.payload ? null : state.error;
+            state.loading = action.payload;
         }
     }
 })
