@@ -1,24 +1,30 @@
 import { TextField, Grid, Button, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 import { signupUser } from '../redux/thunks/auth';
 
 const useStyles = makeStyles({
     signupForm: {
-        height: 1000,
-        marginTop: 20
+        padding: 20
     },
     authFormField: {
-        margin: '0 auto',
-        marginBottom: '17px',
+        margin: '9px auto',
         width: 500
+    },
+    logo: {
+        height: 50,
+        width: 50,
+        margin: '0 auto'
     }
 })
 
 export default function(props) {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { currentUser } = useSelector(state => state.auth)
     const [ email, setEmail ] = React.useState('')
     const emailInputHandler = React.useCallback(
         (e) => {
@@ -46,11 +52,18 @@ export default function(props) {
         dispatch(signupUser({ email, username, password }))
     })
 
+    React.useEffect(() => {
+        if (currentUser.token) {
+            navigate('/home')
+        }
+    }, [currentUser])
+
     const submitEnabled = React.useMemo(() => email.length && username.length && password.length, [email, username, password])
 
     return (<>
-        <Typography variant='h1'>Sign Up</Typography>
             <Grid className={classes.signupForm} container direction='column'>
+                <img src='logo.webp' className={classes.logo} />
+                <Typography variant='h1'>Sign Up</Typography>
                 <div className={classes.authFormField}>
                     <TextField id='email-input' variant='outlined' onChange={emailInputHandler} value={email} label='Email' size='medium' fullWidth required/>
                 </div>

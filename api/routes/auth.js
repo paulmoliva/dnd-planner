@@ -14,8 +14,10 @@ router.post('/signup', async (req, res) => {
             return res.status(500).json({ ok: false })
         }
         const newUser = User.build({ username, email, hash })
+        const token = uuidv4();
+        newUser.token = token;
         await newUser.save();
-        res.status(200).json({ ok: true, username, email })
+        res.status(200).json({ ok: true, username, email, token })
     });
 })
 

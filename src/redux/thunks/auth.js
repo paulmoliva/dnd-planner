@@ -1,12 +1,16 @@
 import axios from "axios"
-import { error } from "../auth";
+import { setError, setLoading, setC, login } from "../auth";
 
-export const signupUser = (signUpData) => async (getState, dispatch) => {
+export const signupUser = (signUpData) => async (dispatch, getState) => {
+    dispatch(setLoading(true))
     const signUpResponse = await axios.post('/api/auth/signup', signUpData);
     const { data } = signUpResponse
     if (data.ok) {
-        dispatch(error(null))
+        dispatch(setError(null))
+        const { token, email, username } = data;
+        dispatch(login({ token, username, email }))
     } else {
-        dispatch(error(data.message))
+        dispatch(setError(data.message))
     }
+    dispatch(setLoading(false))
 }
