@@ -1,9 +1,9 @@
-import { TextField, Grid, Button, Typography } from '@mui/material';
+import { TextField, Grid, Button, Typography, Link } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { signupUser } from '../redux/thunks/auth';
+import { signupUser, loginUser } from '../redux/thunks/auth';
 
 const useStyles = makeStyles({
     signupForm: {
@@ -21,6 +21,7 @@ const useStyles = makeStyles({
 })
 
 export default function(props) {
+    const { mode } = props
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -51,6 +52,15 @@ export default function(props) {
     const signupButtonClickHandler = React.useCallback(() => {
         dispatch(signupUser({ email, username, password }))
     })
+    const loginButtonClickHandler = React.useCallback(() => {
+        dispatch(loginUser({ username, password }))
+    })
+    const goToLogin = React.useCallback(() => {
+        navigate('/login')
+    })
+    const goToSignup = React.useCallback(() => {
+        navigate('/signup')
+    })
 
     React.useEffect(() => {
         if (currentUser.token) {
@@ -58,15 +68,15 @@ export default function(props) {
         }
     }, [currentUser])
 
-    const submitEnabled = React.useMemo(() => email.length && username.length && password.length, [email, username, password])
+    const submitEnabled = React.useMemo(() => (mode !== 'signup' || email.length) && username.length && password.length, [email, username, password, mode])
 
     return (<>
             <Grid className={classes.signupForm} container direction='column'>
                 <img src='logo.webp' className={classes.logo} />
-                <Typography variant='h1'>Sign Up</Typography>
-                <div className={classes.authFormField}>
+                <Typography variant='h1'>{mode === 'signup' ? 'Sign Up' : 'Log In'}</Typography>
+                {mode === 'signup' && <div className={classes.authFormField}>
                     <TextField id='email-input' variant='outlined' onChange={emailInputHandler} value={email} label='Email' size='medium' fullWidth required/>
-                </div>
+                </div>}
                 <div className={classes.authFormField}>
                     <TextField id='username-input' variant='outlined' onChange={usernameInputHandler} value={username} label='Username' size='medium' fullWidth required/>
                 </div>
@@ -74,7 +84,12 @@ export default function(props) {
                     <TextField id='password-input' variant='outlined' onChange={passwordInputHandler} value={password} type="password" label='Password' size='medium' fullWidth required/>
                 </div>
                 <div className={classes.authFormField}>
-                    <Button variant='outlined' onClick={signupButtonClickHandler} disabled={!submitEnabled}>Sign Up</Button>
+                    {mode === 'signup' && <Button variant='outlined' onClick={signupButtonClickHandler} disabled={!submitEnabled}>Sign Up</Button>}
+                    {mode === 'login' && <Button variant='outlined' onClick={loginButtonClickHandler} disabled={!submitEnabled}>Login</Button>}
+                </div>
+                <div className={classes.authFormField}>
+                    {mode === 'signup' && <Link sx={{cursor: 'pointer'}} onClick={goToLogin}>Log In</Link>}
+                    {mode === 'login' && <Link sx={{cursor: 'pointer'}} onClick={goToSignup}>Sign Up</Link>}
                 </div>
             </Grid>
     </>)

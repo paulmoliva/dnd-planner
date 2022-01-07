@@ -38,10 +38,11 @@ router.post('/login', async (req, res) => {
     bcrypt.compare(password, foundUser.hash, async function(err, result) {
         
         if (result && !err) {
+            const { username, email } = foundUser;
             const token = uuidv4();
             foundUser.token = token;
             await foundUser.save()
-            return res.status(200).json({ ok: true, token })
+            return res.status(200).json({ ok: true, token, username, email })
         }
 
         return res.status(401).json({ ok: false, message })
